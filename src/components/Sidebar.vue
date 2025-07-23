@@ -80,7 +80,7 @@ const handleSortChange = (sort: string) => {
 
 <style scoped>
 .sidebar {
-  overflow-y: hidden;
+  
   --primary-color: white;
   --primary-hover: hsl(216, 100%, 65%);
   --bg-color: #ffffff;
@@ -91,6 +91,7 @@ const handleSortChange = (sort: string) => {
   --scale-hover: 0.05;
   --scale-active: 0.02;
 
+  overflow-y: hidden;
   position: fixed;
   top: 60px;
   left: 0;
@@ -100,7 +101,6 @@ const handleSortChange = (sort: string) => {
   border-right: 1px solid hsl(0, 0%, 92%);
   transition: transform var(--transition-time) ease;
   z-index: 999;
-  overflow-y: auto;
 }
 
 .sidebar.collapsed {

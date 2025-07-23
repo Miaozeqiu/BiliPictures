@@ -139,3 +139,5 @@ playwright/.cache/
 
 # Database config (keep example, ignore actual)
 !src/config/database-example.ts
+
+dist/
