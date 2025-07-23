@@ -5,8 +5,8 @@ import Sidebar from './components/Sidebar.vue'
 import TopNavbar from './components/TopNavbar.vue'
 import TagFilter from './components/TagFilter.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
-import { DatabaseService } from '@/config/database.ts'
-import type { Movie } from '@/config/supabase.ts'
+import { DatabaseService } from './config/database'
+import type { Movie } from './config/supabase'
 
 const isSidebarOpen = ref(true)
 // 全局状态：当前电影数据和加载状态
