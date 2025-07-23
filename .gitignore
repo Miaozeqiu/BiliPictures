@@ -69,7 +69,6 @@ node_modules/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -80,7 +79,6 @@ public
 .storybook-out
 
 # Rollup.js default build output
-dist/
 
 # Uncomment the public line in if your project uses Gatsby
 # https://nextjs.org/blog/next-9-1#public-directory-support
@@ -132,7 +130,6 @@ ehthumbs.db
 Thumbs.db
 
 # Build outputs
-dist/
 build/
 
 # Test results
