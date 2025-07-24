@@ -111,6 +111,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 <style scoped>
 /* 顶部导航栏样式 */
 .top-navbar {
+
   display: flex;
   align-items: center;
   justify-content: space-between;

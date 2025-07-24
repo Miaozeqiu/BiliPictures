@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://mjfhhjwydxblhreatmeo.supabase.co'
+const supabaseUrl = 'https://s.bilipictures.top'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZmhoand5ZHhibGhyZWF0bWVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODgzODIsImV4cCI6MjA2Nzc2NDM4Mn0.vdpICawfu-dUMsM1B7oArCuS-WCrLutsUS0et1e4yNg'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
