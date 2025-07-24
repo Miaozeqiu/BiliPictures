@@ -1,1 +1,0 @@
-import{b as e,c as t,d as n,e as r,f as i,g as a}from"./index-Bt1sxd6n.js";a();export{e as Headers,t as Request,n as Response,r as default,i as fetch};
