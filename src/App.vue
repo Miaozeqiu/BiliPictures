@@ -90,6 +90,11 @@ const fetchMovies = async (loadMore = false) => {
   }
 
   try {
+    // 对于loadMore，先递增页码再计算offset
+    if (loadMore) {
+      currentPage.value++
+    }
+    
     const params: any = {
       sort_by: currentSort.value.sortBy,
       sort_order: currentSort.value.sortOrder,
@@ -123,9 +128,12 @@ const fetchMovies = async (loadMore = false) => {
     }
 
     currentMovies.value = loadMore ? [...currentMovies.value, ...newMovies] : newMovies
-    currentPage.value++
   } catch (error) {
     console.error('获取电影数据失败:', error)
+    // 如果loadMore失败，回退页码
+    if (loadMore) {
+      currentPage.value--
+    }
   } finally {
     if (localRequestId === requestId.value) {
       if (loadMore) {
