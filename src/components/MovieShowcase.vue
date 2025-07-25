@@ -90,14 +90,15 @@ watch(() => props.dbMovies, (newMovies) => {
         rating: movie.douban_rating || 0,
         poster: movie.cover_url || '/src/爱在落日黄昏时.webp', // 使用默认图片作为fallback
         description: movie.description || '暂无描述',
+        douban_url: movie.douban_url || '',
         biliLinks: movie.movie_bilibili_urls && movie.movie_bilibili_urls.length > 0 ?
           movie.movie_bilibili_urls.map(link => ({
             url: link.bilibili_url,
             suspicious: link.suspicious || false,
-            id: link.id
+            id: link.id,
+            note: link.note || ''
           })) :
           []
-        // 不再处理douban_url链接
       }))
     isLoading.value = false
   } else if (newMovies && !props.isLoading) {
@@ -224,8 +225,44 @@ const handleMovieClick = async (movie, event) => {
 
   // 创建描述元素
   const descElement = document.createElement('p')
-  descElement.textContent = movie.description.substring(0, 60) + '...'
   descElement.style.cssText = 'margin: 0 0 1rem 0; color: #555; font-size: 0.85rem; line-height: 1.4; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
+  
+  // 处理描述文本：去除换行符，确保至少显示50个字符
+  const cleanDescription = movie.description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+  const minLength = 100
+  let displayText = ''
+  
+  if (cleanDescription.length <= minLength) {
+    displayText = cleanDescription
+  } else {
+    displayText = cleanDescription.substring(0, minLength) + '...'
+  }
+  
+  // 创建描述文本节点
+  const descTextNode = document.createTextNode(displayText)
+  descElement.appendChild(descTextNode)
+  
+  // 如果有豆瓣链接，添加"详情"链接
+  if (movie.douban_url) {
+    const detailLink = document.createElement('a')
+    detailLink.href = movie.douban_url
+    detailLink.target = '_blank'
+    detailLink.textContent = '详情'
+    detailLink.style.cssText = 'color: #00a1d6; text-decoration: none; margin-left: 4px; font-weight: 500; transition: color 0.3s ease;'
+    
+    // 添加悬停效果
+    detailLink.addEventListener('mouseenter', () => {
+      detailLink.style.color = '#ff6699'
+      detailLink.style.textDecoration = 'underline'
+    })
+    detailLink.addEventListener('mouseleave', () => {
+      detailLink.style.color = '#00a1d6'
+      detailLink.style.textDecoration = 'none'
+    })
+    
+    descElement.appendChild(detailLink)
+  }
+  
   textInfo.appendChild(descElement)
 
   // 创建B站链接容器
@@ -273,6 +310,14 @@ const handleMovieClick = async (movie, event) => {
             }
 
             linkItemContainer.appendChild(linkWrapperDiv)
+
+            // 如果有备注信息，添加备注显示
+            if (linkObj.note && linkObj.note.trim()) {
+              const noteElement = document.createElement('div')
+              noteElement.style.cssText = 'margin: 0px 0px 8px 0px; padding: 6px 8px; background: #e3f2fd; color: #1976d2; border-radius: 4px; font-size: 0.75rem; line-height: 1.3;'
+              noteElement.textContent = `备注: ${linkObj.note}`
+              linkItemContainer.appendChild(noteElement)
+            }
 
             // 为每个链接创建按钮容器
             const linkButtonContainer = document.createElement('div')

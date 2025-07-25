@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { Movie, Tag, MovieTag, MovieQueryParams } from './supabase'
+import type { Movie, Tag, MovieTag, MovieQueryParams, MovieBilibiliUrl } from './supabase'
 
 /**
  * 数据库操作中间件类
@@ -15,7 +15,7 @@ export class DatabaseService {
       .from('movies')
       .select(`
         *,
-        movie_bilibili_urls ( id, bilibili_url, suspicious )
+        movie_bilibili_urls ( id, bilibili_url, suspicious, note )
       `)
       // 只返回包含bilibili_url的电影
       .not('movie_bilibili_urls', 'is', null)
@@ -102,7 +102,7 @@ export class DatabaseService {
       .from('movies')
       .select(`
         *,
-        movie_bilibili_urls ( id, bilibili_url, suspicious )
+        movie_bilibili_urls ( id, bilibili_url, suspicious, note )
       `)
       .in('movie_id', movieIds)
       // 只返回包含bilibili_url的电影
@@ -204,7 +204,7 @@ export class DatabaseService {
       throw new Error(`获取电影标签失败: ${error.message}`)
     }
 
-    return data?.map(item => item.tags).filter(Boolean) || []
+    return data?.map(item => item.tags as Tag).filter(Boolean) || []
   }
 
   /**
@@ -292,7 +292,7 @@ export const searchTags = DatabaseService.searchTags.bind(DatabaseService)
 export const getMovieStats = DatabaseService.getMovieStats.bind(DatabaseService)
 
 // 导出类型
-export type { MovieQueryParams }
+export type { MovieQueryParams, MovieBilibiliUrl }
 
 // 默认导出
 export default DatabaseService

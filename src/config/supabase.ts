@@ -6,6 +6,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 数据库表类型定义
+export interface MovieBilibiliUrl {
+  id: number
+  bilibili_url: string
+  suspicious?: boolean
+  note?: string
+}
+
 export interface Movie {
   movie_id: number
   movie_title: string
@@ -19,6 +26,7 @@ export interface Movie {
   douban_url?: string
   bilibili_url?: string
   region?: string
+  movie_bilibili_urls?: MovieBilibiliUrl[]
 }
 
 export interface Tag {
