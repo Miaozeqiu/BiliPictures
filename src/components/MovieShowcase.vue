@@ -165,18 +165,22 @@ const handleMovieClick = async (movie, event) => {
   animatedContainer.style.zIndex = '9999'
   animatedContainer.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
   animatedContainer.style.display = 'flex'
-  animatedContainer.style.alignItems = 'flex-start'
+  animatedContainer.style.alignItems = 'center'
   animatedContainer.style.gap = '0'
+
+  // 检测是否为移动端
+  const isMobile = window.innerWidth <= 768
 
   // 创建动画海报副本（复用原始图片，避免重新请求）
   const animatedPoster = posterElement.cloneNode(true)
   animatedPoster.className = 'animated-poster'
   animatedPoster.style.width = '100%'
   animatedPoster.style.height = '100%'
-  animatedPoster.style.borderRadius = '8px 0 0 8px' // 只保留左侧圆角
+  animatedPoster.style.borderRadius = isMobile ? '8px' : '8px 0 0 8px' // 移动端全圆角
   animatedPoster.style.objectFit = 'cover'
   animatedPoster.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.3)'
   animatedPoster.style.flexShrink = '0'
+  animatedPoster.style.display = isMobile ? 'none' : 'block' // 移动端隐藏海报
 
   // 创建文字信息容器
   const textInfo = document.createElement('div')
@@ -184,35 +188,66 @@ const handleMovieClick = async (movie, event) => {
   textInfo.style.background = 'rgba(255, 255, 255, 0.95)'
   textInfo.style.backdropFilter = 'blur(10px)'
   textInfo.style.padding = '1rem'
-  textInfo.style.borderRadius = '0 8px 8px 0'
+  textInfo.style.borderRadius = isMobile ? '8px' : '0 8px 8px 0' // 移动端全圆角
   // textInfo.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)'
-  textInfo.style.minWidth = '300px'
-  textInfo.style.maxWidth = '350px'
+  textInfo.style.minWidth = isMobile ? '90vw' : '300px' // 移动端占据更多宽度
+  textInfo.style.maxWidth = isMobile ? '90vw' : '350px' // 移动端占据更多宽度
   textInfo.style.height = '100%'
+  textInfo.style.maxHeight = '80vh'
   textInfo.style.boxSizing = 'border-box'
   textInfo.style.display = 'flex'
   textInfo.style.flexDirection = 'column'
-  textInfo.style.justifyContent = 'center'
+  textInfo.style.justifyContent = 'flex-start'
   textInfo.style.opacity = '0'
   textInfo.style.width = '0'
-  textInfo.style.overflow = 'hidden'
+  textInfo.style.overflowX = 'hidden'
   textInfo.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+  
+  // 添加美观的滚动条样式
+  textInfo.style.scrollbarWidth = 'thin'
+  textInfo.style.scrollbarColor = '#c1c1c1 transparent'
+  
+  // 为Webkit浏览器添加自定义滚动条样式
+  const scrollbarStyle = document.createElement('style')
+  scrollbarStyle.textContent = `
+    .animated-text-info div::-webkit-scrollbar {
+      width: 6px;
+    }
+    .animated-text-info div::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .animated-text-info div::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+    .animated-text-info div::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.4);
+    }
+  `
+  if (!document.querySelector('style[data-scrollbar="animated-text-info"]')) {
+    scrollbarStyle.setAttribute('data-scrollbar', 'animated-text-info')
+    document.head.appendChild(scrollbarStyle)
+  }
 
+  // 创建固定头部区域
+  const headerSection = document.createElement('div')
+  headerSection.style.cssText = 'flex-shrink: 0; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;'
+  
   // 创建标题元素
   const titleElement = document.createElement('h3')
   titleElement.textContent = movie.title
-  titleElement.style.cssText = 'margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #333; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
-  textInfo.appendChild(titleElement)
+  titleElement.style.cssText = 'margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #333; font-weight: 600; white-space: normal; word-wrap: break-word; line-height: 1.3; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
+  headerSection.appendChild(titleElement)
 
   // 创建年份元素
   const yearElement = document.createElement('p')
   yearElement.textContent = movie.year
   yearElement.style.cssText = 'margin: 0 0 0.5rem 0; color: #666; font-size: 0.9rem; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
-  textInfo.appendChild(yearElement)
+  headerSection.appendChild(yearElement)
 
   // 创建评分容器
   const ratingContainer = document.createElement('div')
-  ratingContainer.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
+  ratingContainer.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   const starSpan = document.createElement('span')
   starSpan.textContent = '★'
   starSpan.style.cssText = 'color: #ffd700; font-size: 1rem;'
@@ -221,7 +256,13 @@ const handleMovieClick = async (movie, event) => {
   ratingSpan.style.cssText = 'color: #333; font-weight: 600;'
   ratingContainer.appendChild(starSpan)
   ratingContainer.appendChild(ratingSpan)
-  textInfo.appendChild(ratingContainer)
+  headerSection.appendChild(ratingContainer)
+  
+  textInfo.appendChild(headerSection)
+  
+  // 创建可滚动内容区域
+  const scrollableContent = document.createElement('div')
+  scrollableContent.style.cssText = 'flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: #c1c1c1 transparent;'
 
   // 创建描述元素
   const descElement = document.createElement('p')
@@ -263,7 +304,7 @@ const handleMovieClick = async (movie, event) => {
     descElement.appendChild(detailLink)
   }
   
-  textInfo.appendChild(descElement)
+  scrollableContent.appendChild(descElement)
 
   // 创建B站链接容器
   const linkContainer = document.createElement('div')
@@ -524,7 +565,10 @@ const handleMovieClick = async (movie, event) => {
   linkDiv.style.cssText = 'background: #f5f5f5; padding: 0.3rem; border-radius: 4px; font-size: 0.75rem; color: #666; word-break: break-all; margin-bottom: 0.5rem;'
   linkContainer.appendChild(linkLabel)
   linkContainer.appendChild(linkDiv)
-  textInfo.appendChild(linkContainer)
+  scrollableContent.appendChild(linkContainer)
+  
+  // 将可滚动内容区域添加到主容器
+  textInfo.appendChild(scrollableContent)
 
   // 创建按钮容器
   const buttonContainer = document.createElement('div')
@@ -602,7 +646,9 @@ markIconSpan.style.marginLeft = '5px'
   const animatedElements = [titleElement, yearElement, ratingContainer, descElement, linkContainer]
 
   // 组装容器
-  animatedContainer.appendChild(animatedPoster)
+  if (!isMobile) {
+    animatedContainer.appendChild(animatedPoster)
+  }
   animatedContainer.appendChild(textInfo)
 
   // 隐藏原始海报
@@ -644,24 +690,33 @@ markIconSpan.style.marginLeft = '5px'
     // 显示背景模糊
     blurBackground.style.opacity = '1'
 
-    // 计算保持比例的尺寸
-    const maxWidth = Math.min(window.innerWidth * 0.8, 600)
-    const maxHeight = window.innerHeight * 0.8
-    const aspectRatio = rect.width / rect.height
-
-    let newWidth, newHeight
-    if (maxWidth / aspectRatio <= maxHeight) {
-      newWidth = Math.round(maxWidth)
-      newHeight = Math.round(maxWidth / aspectRatio)
+    let newWidth, newHeight, centerX, centerY
+    
+    if (isMobile) {
+      // 移动端：只显示文字信息，占据大部分屏幕宽度
+      newWidth = Math.round(window.innerWidth * 0.9)
+      newHeight = Math.round(window.innerHeight * 0.6)
+      centerX = Math.round((window.innerWidth - newWidth) / 2)
+      centerY = Math.round((window.innerHeight - newHeight) / 2)
     } else {
-      newHeight = Math.round(maxHeight)
-      newWidth = Math.round(maxHeight * aspectRatio)
-    }
+      // 桌面端：计算保持比例的尺寸
+      const maxWidth = Math.min(window.innerWidth * 0.8, 600)
+      const maxHeight = window.innerHeight * 0.8
+      const aspectRatio = rect.width / rect.height
 
-    // 计算居中位置，考虑文字区域向左偏移
-    const textAreaWidth = 350 // 文字区域的大概宽度
-    const centerX = Math.round((window.innerWidth - newWidth) / 2 - textAreaWidth / 4)
-    const centerY = Math.round((window.innerHeight - newHeight) / 2)
+      if (maxWidth / aspectRatio <= maxHeight) {
+        newWidth = Math.round(maxWidth)
+        newHeight = Math.round(maxWidth / aspectRatio)
+      } else {
+        newHeight = Math.round(maxHeight)
+        newWidth = Math.round(maxHeight * aspectRatio)
+      }
+
+      // 计算居中位置，考虑文字区域向左偏移
+      const textAreaWidth = 350 // 文字区域的大概宽度
+      centerX = Math.round((window.innerWidth - newWidth) / 2 - textAreaWidth / 4)
+      centerY = Math.round((window.innerHeight - newHeight) / 2)
+    }
 
     animatedContainer.style.left = `${centerX}px`
     animatedContainer.style.top = `${centerY}px`

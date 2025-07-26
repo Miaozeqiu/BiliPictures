@@ -260,5 +260,15 @@ onUnmounted(() => {
   left: 0;
 }
 
+/* 移动端样式 */
+@media (max-width: 768px) {
+  .main-content {
+    left: 0 !important;
+  }
+  
+  .main-content.expanded {
+    left: 0;
+  }
+}
 
 </style>

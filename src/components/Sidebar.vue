@@ -143,8 +143,14 @@ const handleSortChange = (sort: string) => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
     width: 280px;
+    height: calc(100vh - 60px);
+    z-index: 1000;
     transform: translateX(-100%);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar:not(.collapsed) {

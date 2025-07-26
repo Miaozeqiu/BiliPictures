@@ -3,6 +3,7 @@ import { ref, inject } from 'vue'
 
 const searchQuery = ref('')
 const isSidebarOpen = ref(true)
+const isSearchFocused = ref(false)
 
 // 注入App.vue中的请求ID和搜索方法
 const requestId = inject<{ value: number }>('requestId')
@@ -80,7 +81,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
           <span class="bottom" />
         </span>
       </button>
-      <h1 class="app-title">BiliPictures</h1>
+      <h1 class="app-title" :class="{ 'hidden-on-focus': isSearchFocused }">BiliPictures</h1>
     </div>
 
     <div class="navbar-center">
@@ -91,6 +92,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
           placeholder="电影，动漫，纪录片..."
           class="search-input"
           @keydown="handleKeyDown"
+          @focus="isSearchFocused = true"
+          @blur="isSearchFocused = false"
         />
         <button v-if="searchQuery" @click="clearSearch" class="clear-button">×</button>
         <span class="search-text" @click="handleSearch">搜索</span>
@@ -189,6 +192,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   font-size: 24px;
   font-weight: bold;
   margin: 0;
+  transition: all 0.3s ease;
 }
 
 .navbar-center {
@@ -281,21 +285,41 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .navbar-left {
+    gap: 0;
+  }
+  
+  .app-title.hidden-on-focus {
+    opacity: 0;
+    transform: translateX(-20px);
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
   .navbar-center {
     margin: 0 10px;
   }
 
   .search-container {
-    max-width: 300px;
+    max-width: 200px;
+    margin-left: 0;
   }
 
   .search-input {
     font-size: 14px;
-    padding: 10px 15px;
+    padding: 8px 12px;
+    width: 120px;
+  }
+  
+  .search-input:focus {
+    width: 160px;
   }
 
   .search-btn {
-    padding: 10px 15px;
+    padding: 8px 12px;
   }
 }
 </style>
