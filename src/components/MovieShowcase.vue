@@ -288,6 +288,7 @@ const handleMovieClick = async (movie, event) => {
     const detailLink = document.createElement('a')
     detailLink.href = movie.douban_url
     detailLink.target = '_blank'
+    detailLink.rel = 'noopener noreferrer'
     detailLink.textContent = '详情'
     detailLink.style.cssText = 'color: #00a1d6; text-decoration: none; margin-left: 4px; font-weight: 500; transition: color 0.3s ease;'
     
@@ -299,6 +300,12 @@ const handleMovieClick = async (movie, event) => {
     detailLink.addEventListener('mouseleave', () => {
       detailLink.style.color = '#00a1d6'
       detailLink.style.textDecoration = 'none'
+    })
+
+    // 使用 JavaScript 打开链接以避免被检测到
+    detailLink.addEventListener('click', (e) => {
+      e.preventDefault()
+      window.open(movie.douban_url, '_blank', 'noopener,noreferrer')
     })
     
     descElement.appendChild(detailLink)
@@ -328,6 +335,7 @@ const handleMovieClick = async (movie, event) => {
             linkElement.href = linkObj.url
             linkElement.textContent = linkObj.url
             linkElement.target = '_blank'
+            linkElement.rel = 'noopener noreferrer'
             linkElement.style.cssText = 'word-break: break-all; color: #00a1d6; text-decoration: none; transition: all 0.3s ease; flex-grow: 1;'
 
             // 添加链接悬停效果
@@ -338,6 +346,12 @@ const handleMovieClick = async (movie, event) => {
             linkElement.addEventListener('mouseleave', () => {
               linkElement.style.color = '#00a1d6'
               linkElement.style.textDecoration = 'none'
+            })
+
+            // 使用 JavaScript 打开链接以避免被检测到
+            linkElement.addEventListener('click', (e) => {
+              e.preventDefault()
+              window.open(linkObj.url, '_blank', 'noopener,noreferrer')
             })
 
             linkWrapperDiv.appendChild(linkElement)
