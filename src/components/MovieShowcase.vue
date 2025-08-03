@@ -1119,10 +1119,6 @@ onMounted(() => {
     font-size: 2rem;
   }
 
-  .movie-grid {
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 480px) {

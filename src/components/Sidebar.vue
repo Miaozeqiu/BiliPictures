@@ -98,6 +98,7 @@ const handleSortChange = (sort: string) => {
   width: 250px;
   height: calc(100vh - 60px);
   background: var(--bg-color);
+  border-top: 1px solid hsl(0, 0%, 92%);
   border-right: 1px solid hsl(0, 0%, 92%);
   transition: transform var(--transition-time) ease;
   z-index: 999;
@@ -150,7 +151,7 @@ const handleSortChange = (sort: string) => {
     height: calc(100vh - 60px);
     z-index: 1000;
     transform: translateX(-100%);
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+
   }
 
   .sidebar:not(.collapsed) {

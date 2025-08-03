@@ -82,9 +82,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
         </span>
       </button>
       <h1 class="app-title" :class="{ 'hidden-on-focus': isSearchFocused }">BiliPictures</h1>
-    </div>
-
-    <div class="navbar-center">
       <div class="search-container">
         <input
           v-model="searchQuery"
@@ -96,8 +93,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
           @blur="isSearchFocused = false"
         />
         <button v-if="searchQuery" @click="clearSearch" class="clear-button">×</button>
-        <span class="search-text" @click="handleSearch">搜索</span>
       </div>
+    </div>
+
+    <div class="navbar-center">
+      <span class="search-text" @click="handleSearch">搜索</span>
     </div>
 
     <!-- <div class="navbar-right">
@@ -122,7 +122,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background: #ffffff;
   color: #fc8cba;
   /* font-family: 'Caveat', 'Ma Shan Zheng', cursive; */
-  padding: 0 20px;
+  padding: 0 0px;
   box-shadow: 0 2px 10px rgba(211, 211, 211, 0.08);
   z-index: 1000;
   border-bottom: 1px solid #eaeaea;
@@ -132,6 +132,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1;
+
 }
 
 .VPNavBarHamburger {
@@ -196,11 +198,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
 }
 
 .navbar-center {
-  flex: 1;
   display: flex;
   justify-content: center;
-  max-width: 600px;
+  align-items: center;
   margin: 0 20px;
+  transition: all 0.3s ease;
 }
 
 
@@ -210,7 +212,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
   align-items: center;
   gap: 8px;
   margin-left: auto;
+  transition: all 0.3s ease;
 }
+
+
 
 
 .search-input {
@@ -283,39 +288,68 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 完全重新设计的布局 */
 @media (max-width: 768px) {
+  .top-navbar {
+    position: relative;
+  }
+  
   .navbar-left {
-    gap: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 2;
+  }
+  
+  .app-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
   }
   
   .app-title.hidden-on-focus {
     opacity: 0;
     transform: translateX(-20px);
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
-    flex-shrink: 0;
+    pointer-events: none;
+  }
+  
+  .search-container {
+    position: absolute;
+    left: 180px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 150px;
+    transition: all 0.3s ease;
+  }
+  
+  .search-container:focus-within {
+    left: 50px;
+    width: 280px;
   }
   
   .navbar-center {
-    margin: 0 10px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
   }
-
-  .search-container {
-    max-width: 200px;
-    margin-left: 0;
-  }
-
+  
   .search-input {
     font-size: 14px;
     padding: 8px 12px;
     width: 120px;
+    transition: all 0.3s ease;
   }
   
   .search-input:focus {
-    width: 160px;
+    width: 280px;
   }
 
   .search-btn {
