@@ -61,7 +61,7 @@ BiliPictures 是一个公共的B站收藏夹项目，专注于收集和分享优
    ```bash
    npm run build
    ```
-6. supabase 创建表
+6. **supabase 创建表**
 
 ```sql
 create table public.movie_bilibili_urls (
