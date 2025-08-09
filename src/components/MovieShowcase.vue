@@ -59,12 +59,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import type { Movie, MovieBilibiliUrl } from '@/config/supabase'
+import type { Movie as DbMovie } from '@/config/supabase'
+
+// 组件内部使用的Movie类型，包含转换后的数据结构
+interface Movie {
+  id: number
+  title: string
+  year: string
+  rating: number
+  poster: string
+  description: string
+  douban_url: string
+  biliLinks: {
+    url: string
+    suspicious: boolean
+    id: number
+    note: string
+  }[]
+}
 import { supabase } from '@/config/supabase'
 
 // 定义props
 const props = defineProps<{
-  dbMovies?: Movie[]
+  dbMovies: DbMovie[]
   isLoading?: boolean
 }>()
 
@@ -117,7 +134,7 @@ watch(() => props.isLoading, (loading) => {
 
 // 处理电影点击事件
 const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
-  console.log('点击了电影:', movie.movie_title)
+  console.log('点击了电影:', movie.title)
 
   // 获取被点击的海报元素
   const posterElement = (event.currentTarget as HTMLElement)?.querySelector('.poster-image')
@@ -236,13 +253,13 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
   
   // 创建标题元素
   const titleElement = document.createElement('h3')
-  titleElement.textContent = movie.movie_title
+  titleElement.textContent = movie.title
   titleElement.style.cssText = 'margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #333; font-weight: 600; white-space: normal; word-wrap: break-word; line-height: 1.3; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   headerSection.appendChild(titleElement)
 
   // 创建年份元素
   const yearElement = document.createElement('p')
-  yearElement.textContent = movie.release_year?.toString() || ''
+  yearElement.textContent = movie.year || ''
   yearElement.style.cssText = 'margin: 0 0 0.5rem 0; color: #666; font-size: 0.9rem; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   headerSection.appendChild(yearElement)
 
@@ -253,7 +270,7 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
   starSpan.textContent = '★'
   starSpan.style.cssText = 'color: #ffd700; font-size: 1rem;'
   const ratingSpan = document.createElement('span')
-  ratingSpan.textContent = movie.douban_rating?.toString() || 'N/A'
+  ratingSpan.textContent = movie.rating?.toString() || 'N/A'
   ratingSpan.style.cssText = 'color: #333; font-weight: 600;'
   ratingContainer.appendChild(starSpan)
   ratingContainer.appendChild(ratingSpan)
@@ -321,8 +338,8 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
   linkLabel.textContent = 'B站观看链接:'
   linkLabel.style.cssText = 'margin: 0 0 0.3rem 0; color: #333; font-size: 0.8rem; font-weight: 600;'
   const linkDiv = document.createElement('div')
-          if (movie.movie_bilibili_urls && movie.movie_bilibili_urls.length > 0) {
-          movie.movie_bilibili_urls.forEach((linkObj: MovieBilibiliUrl) => {
+          if (movie.biliLinks && movie.biliLinks.length > 0) {
+          movie.biliLinks.forEach((linkObj: any) => {
             // 为每个链接创建一个容器
             const linkItemContainer = document.createElement('div')
             linkItemContainer.style.cssText = 'display: flex; flex-direction: column; margin-bottom: 10px; background: #f5f5f5; border-radius: 4px;'
@@ -333,8 +350,8 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
 
             // 创建链接元素
             const linkElement = document.createElement('a')
-            linkElement.href = linkObj.bilibili_url
-            linkElement.textContent = linkObj.bilibili_url
+            linkElement.href = linkObj.url
+            linkElement.textContent = linkObj.url
             linkElement.target = '_blank'
             linkElement.rel = 'noopener noreferrer'
             linkElement.style.cssText = 'word-break: break-all; color: #00a1d6; text-decoration: none; transition: all 0.3s ease; flex-grow: 1;'
@@ -352,7 +369,7 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
             // 使用 JavaScript 打开链接以避免被检测到
             linkElement.addEventListener('click', (e) => {
               e.preventDefault()
-              window.open(linkObj.bilibili_url, '_blank', 'noopener,noreferrer')
+              window.open(linkObj.url, '_blank', 'noopener,noreferrer')
             })
 
             linkWrapperDiv.appendChild(linkElement)
@@ -450,7 +467,7 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
             // 添加复制按钮事件监听
             linkCopyBtn.addEventListener('click', (e) => {
               e.stopPropagation() // 阻止事件冒泡
-              navigator.clipboard.writeText(linkObj.bilibili_url).then(() => {
+              navigator.clipboard.writeText(linkObj.url).then(() => {
                 // 切换图标显示
                 linkCopyIconSpan.style.display = 'none'
                 linkSuccessIconSpan.style.display = 'inline-block'
@@ -480,7 +497,7 @@ const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
             // 添加标记按钮事件监听
             linkMarkBtn.addEventListener('click', async (e) => {
               e.stopPropagation() // 阻止事件冒泡
-              console.log('标记按钮被点击，链接：', linkObj.bilibili_url)
+              console.log('标记按钮被点击，链接：', linkObj.url)
 
               // 保存原始图标HTML
               const originalIconHTML = linkMarkIconSpan.innerHTML

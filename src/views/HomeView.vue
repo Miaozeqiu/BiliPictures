@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { inject } from 'vue'
 import MovieShowcase from '../components/MovieShowcase.vue'
-import type { Movie } from '@/config/supabase'
+import type { Movie as DbMovie } from '@/config/supabase'
 import type { Ref } from 'vue'
 
 // 注入来自App.vue的电影数据和加载状态
-const currentMovies = inject<Ref<Movie[]>>('currentMovies')
+const currentMovies = inject<Ref<DbMovie[]>>('currentMovies')
 const currentLoadingState = inject<Ref<boolean>>('currentLoadingState')
 </script>
 
 <template>
   <div class="home-container">
     <div class="featured-section">
-      <MovieShowcase :db-movies="currentMovies" :is-loading="currentLoadingState" />
+      <MovieShowcase :db-movies="currentMovies || []" :is-loading="currentLoadingState || false" />
     </div>
   </div>
 </template>
