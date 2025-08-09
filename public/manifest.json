@@ -1,0 +1,23 @@
+{
+  "name": "BiliPictures - 公共B站影视收藏夹",
+  "short_name": "BiliPictures",
+  "description": "发现优秀的影视作品，及其B站链接",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/favicon.fef2ec21.ico",
+      "sizes": "any",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "lifestyle"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
