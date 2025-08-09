@@ -1,12 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiliPictures</title>
-    <script type="module" crossorigin src="/assets/index-BjJdeLgl.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-VUT8Hm77.css">
+    <link rel="icon" href="/assets/favicon.fef2ec21-lyI7t_4J.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BiliPictures - 公共B站影视收藏夹</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="BiliPictures 是一个公共B站的B站影视收藏夹，你可以在上面方便找到你想看的影视的B站链接">
+    <meta name="keywords" content="电影推荐,电影评分,影视作品,BiliPictures,电影介绍,观影指南,B站,收藏夹">
+    <meta name="author" content="BiliPictures">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="BiliPictures - 公共B站影视收藏夹">
+    <meta property="og:description" content="发现优秀的影视作品，及其B站链接">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bilipictures.com">
+    <meta property="og:image" content="data:image/x-icon;base64,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">
+    <meta property="og:site_name" content="BiliPictures">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BiliPictures - 公共B站影视收藏夹">
+    <meta name="twitter:description" content="发现优秀的影视作品，及其B站链接">
+    <meta name="twitter:image" content="data:image/x-icon;base64,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">
+    
+    <!-- Additional SEO Tags -->
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- Safari specific meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BiliPictures">
+    <link rel="canonical" href="https://bilipictures.com">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Microsoft Clarity Analytics -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "skt5besiqo");
+    </script>
+    <script type="module" crossorigin src="/assets/index-BqpVglr2.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BEoBj7fG.css">
   </head>
   <body>
     <div id="app"></div>

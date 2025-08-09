@@ -23,7 +23,7 @@ import { useRouter } from 'vue-router'
 import PlatformSwitch from './PlatformSwitch.vue'
 import SortSwitch from './SortSwitch.vue'
 
-const props = defineProps<{
+defineProps<{
   isSidebarOpen: boolean
 }>()
 

@@ -48,7 +48,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { DatabaseService } from '@/config/database'
-import type { Tag } from '@/config/supabase'
 
 interface LocalTag {
   id: number
@@ -119,7 +118,7 @@ const isTagSelected = (tagId: number) => {
 }
 
 // 添加标签
-const addTag = (tag: Tag) => {
+const addTag = (tag: LocalTag) => {
   if (!isTagSelected(tag.id)) {
     const newSelectedTagIds = [...props.selectedTagIds, tag.id]
     emit('tagChange', newSelectedTagIds)

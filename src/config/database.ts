@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { Movie, Tag, MovieTag, MovieQueryParams, MovieBilibiliUrl } from './supabase'
+import type { Movie, Tag, MovieQueryParams, MovieBilibiliUrl } from './supabase'
 
 /**
  * 数据库操作中间件类
@@ -42,7 +42,7 @@ export class DatabaseService {
     }
 
     if (params.search) {
-      query = query.or(`movie_title.ilike.%${params.search}%,original_title.ilike.%${params.search}%,description.ilike.%${params.search}%`)
+      query = query.or(`movie_title.ilike.%${params.search}%,original_title.ilike.%${params.search}%,aka.ilike.%${params.search}%,description.ilike.%${params.search}%`)
     }
 
     // 排序
@@ -130,7 +130,7 @@ export class DatabaseService {
     }
 
     if (params.search) {
-      query = query.or(`movie_title.ilike.%${params.search}%,original_title.ilike.%${params.search}%,description.ilike.%${params.search}%`)
+      query = query.or(`movie_title.ilike.%${params.search}%,original_title.ilike.%${params.search}%,aka.ilike.%${params.search}%,description.ilike.%${params.search}%`)
     }
 
     // 排序
@@ -204,7 +204,7 @@ export class DatabaseService {
       throw new Error(`获取电影标签失败: ${error.message}`)
     }
 
-    return data?.map(item => item.tags as Tag).filter(Boolean) || []
+    return data?.map(item => item.tags as unknown as Tag).filter(Boolean) || []
   }
 
   /**

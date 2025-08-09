@@ -232,7 +232,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 .clear-button {
   position: absolute;
-  right: 70px; /* 调整位置，使其在输入框内 */
+  right: 10px; /* 调整位置，使其在输入框内 */
   top: 50%;
   transform: translateY(-50%);
   background: none;

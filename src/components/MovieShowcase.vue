@@ -58,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
-import type { Movie } from '@/config/supabase'
+import { ref, onMounted, watch } from 'vue'
+import type { Movie, MovieBilibiliUrl } from '@/config/supabase'
 import { supabase } from '@/config/supabase'
 
 // 定义props
@@ -69,8 +69,8 @@ const props = defineProps<{
 }>()
 
 // 动画相关状态
-const originalPosterRect = ref(null)
-const originalPosterElement = ref(null)
+const originalPosterRect = ref<{ left: number; top: number; width: number; height: number } | null>(null)
+const originalPosterElement = ref<HTMLElement | null>(null)
 
 // 响应式数据
 const movies = ref<any[]>([])
@@ -116,17 +116,18 @@ watch(() => props.isLoading, (loading) => {
 }, { immediate: true })
 
 // 处理电影点击事件
-const handleMovieClick = async (movie, event) => {
-  console.log('点击了电影:', movie.title)
+const handleMovieClick = async (movie: Movie, event: MouseEvent) => {
+  console.log('点击了电影:', movie.movie_title)
 
   // 获取被点击的海报元素
-  const posterElement = event.currentTarget.querySelector('.poster-image')
+  const posterElement = (event.currentTarget as HTMLElement)?.querySelector('.poster-image')
   if (!posterElement) return
 
   // 获取原始位置和尺寸
   const rect = posterElement.getBoundingClientRect()
-  const scrollX = window.pageXOffset || document.documentElement.scrollLeft
-  const scrollY = window.pageYOffset || document.documentElement.scrollTop
+  // 获取滚动位置（如果需要的话）
+  // const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+  // const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
   // 保存原始位置和元素引用（取整数像素值）
   originalPosterRect.value = {
@@ -135,7 +136,7 @@ const handleMovieClick = async (movie, event) => {
     width: Math.round(rect.width),
     height: Math.round(rect.height)
   }
-  originalPosterElement.value = posterElement
+  originalPosterElement.value = posterElement as HTMLElement
 
   // 创建背景模糊层
   const blurBackground = document.createElement('div')
@@ -172,7 +173,7 @@ const handleMovieClick = async (movie, event) => {
   const isMobile = window.innerWidth <= 768
 
   // 创建动画海报副本（复用原始图片，避免重新请求）
-  const animatedPoster = posterElement.cloneNode(true)
+  const animatedPoster = posterElement.cloneNode(true) as HTMLElement
   animatedPoster.className = 'animated-poster'
   animatedPoster.style.width = '100%'
   animatedPoster.style.height = '100%'
@@ -235,13 +236,13 @@ const handleMovieClick = async (movie, event) => {
   
   // 创建标题元素
   const titleElement = document.createElement('h3')
-  titleElement.textContent = movie.title
+  titleElement.textContent = movie.movie_title
   titleElement.style.cssText = 'margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #333; font-weight: 600; white-space: normal; word-wrap: break-word; line-height: 1.3; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   headerSection.appendChild(titleElement)
 
   // 创建年份元素
   const yearElement = document.createElement('p')
-  yearElement.textContent = movie.year
+  yearElement.textContent = movie.release_year?.toString() || ''
   yearElement.style.cssText = 'margin: 0 0 0.5rem 0; color: #666; font-size: 0.9rem; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   headerSection.appendChild(yearElement)
 
@@ -252,7 +253,7 @@ const handleMovieClick = async (movie, event) => {
   starSpan.textContent = '★'
   starSpan.style.cssText = 'color: #ffd700; font-size: 1rem;'
   const ratingSpan = document.createElement('span')
-  ratingSpan.textContent = movie.rating
+  ratingSpan.textContent = movie.douban_rating?.toString() || 'N/A'
   ratingSpan.style.cssText = 'color: #333; font-weight: 600;'
   ratingContainer.appendChild(starSpan)
   ratingContainer.appendChild(ratingSpan)
@@ -269,7 +270,7 @@ const handleMovieClick = async (movie, event) => {
   descElement.style.cssText = 'margin: 0 0 1rem 0; color: #555; font-size: 0.85rem; line-height: 1.4; opacity: 0; transform: translateY(20px); transition: all 0.6s ease;'
   
   // 处理描述文本：去除换行符，确保至少显示50个字符
-  const cleanDescription = movie.description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+  const cleanDescription = (movie.description || '暂无简介').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
   const minLength = 100
   let displayText = ''
   
@@ -320,8 +321,8 @@ const handleMovieClick = async (movie, event) => {
   linkLabel.textContent = 'B站观看链接:'
   linkLabel.style.cssText = 'margin: 0 0 0.3rem 0; color: #333; font-size: 0.8rem; font-weight: 600;'
   const linkDiv = document.createElement('div')
-          if (movie.biliLinks && movie.biliLinks.length > 0) {
-          movie.biliLinks.forEach(linkObj => {
+          if (movie.movie_bilibili_urls && movie.movie_bilibili_urls.length > 0) {
+          movie.movie_bilibili_urls.forEach((linkObj: MovieBilibiliUrl) => {
             // 为每个链接创建一个容器
             const linkItemContainer = document.createElement('div')
             linkItemContainer.style.cssText = 'display: flex; flex-direction: column; margin-bottom: 10px; background: #f5f5f5; border-radius: 4px;'
@@ -332,8 +333,8 @@ const handleMovieClick = async (movie, event) => {
 
             // 创建链接元素
             const linkElement = document.createElement('a')
-            linkElement.href = linkObj.url
-            linkElement.textContent = linkObj.url
+            linkElement.href = linkObj.bilibili_url
+            linkElement.textContent = linkObj.bilibili_url
             linkElement.target = '_blank'
             linkElement.rel = 'noopener noreferrer'
             linkElement.style.cssText = 'word-break: break-all; color: #00a1d6; text-decoration: none; transition: all 0.3s ease; flex-grow: 1;'
@@ -351,7 +352,7 @@ const handleMovieClick = async (movie, event) => {
             // 使用 JavaScript 打开链接以避免被检测到
             linkElement.addEventListener('click', (e) => {
               e.preventDefault()
-              window.open(linkObj.url, '_blank', 'noopener,noreferrer')
+              window.open(linkObj.bilibili_url, '_blank', 'noopener,noreferrer')
             })
 
             linkWrapperDiv.appendChild(linkElement)
@@ -449,7 +450,7 @@ const handleMovieClick = async (movie, event) => {
             // 添加复制按钮事件监听
             linkCopyBtn.addEventListener('click', (e) => {
               e.stopPropagation() // 阻止事件冒泡
-              navigator.clipboard.writeText(linkObj.url).then(() => {
+              navigator.clipboard.writeText(linkObj.bilibili_url).then(() => {
                 // 切换图标显示
                 linkCopyIconSpan.style.display = 'none'
                 linkSuccessIconSpan.style.display = 'inline-block'
@@ -479,7 +480,10 @@ const handleMovieClick = async (movie, event) => {
             // 添加标记按钮事件监听
             linkMarkBtn.addEventListener('click', async (e) => {
               e.stopPropagation() // 阻止事件冒泡
-              console.log('标记按钮被点击，链接：', linkObj.url)
+              console.log('标记按钮被点击，链接：', linkObj.bilibili_url)
+
+              // 保存原始图标HTML
+              const originalIconHTML = linkMarkIconSpan.innerHTML
 
               try {
                 // 检查链接是否已经被标记为可疑
@@ -500,7 +504,6 @@ const handleMovieClick = async (movie, event) => {
                 if (!confirmMark) return
 
                 // 显示加载状态
-                const originalIconHTML = linkMarkIconSpan.innerHTML
                 linkMarkIconSpan.innerHTML = `<svg class="loading-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="fill: #e91e63; animation: spin 1s linear infinite;"><path d="M512 64c247.2 0 448 200.8 448 448S759.2 960 512 960 64 759.2 64 512h64c0 212 172 384 384 384s384-172 384-384-172-384-384-384V64z"></path></svg>`
 
                 // 添加旋转动画样式
@@ -661,12 +664,12 @@ markIconSpan.style.marginLeft = '5px'
 
   // 组装容器
   if (!isMobile) {
-    animatedContainer.appendChild(animatedPoster)
+    (animatedContainer as HTMLDivElement).appendChild(animatedPoster);
   }
-  animatedContainer.appendChild(textInfo)
+  (animatedContainer as HTMLDivElement).appendChild(textInfo);
 
   // 隐藏原始海报
-  posterElement.style.opacity = '0'
+  (posterElement as HTMLElement).style.opacity = '0'
 
   // 添加到页面
   document.body.appendChild(animatedContainer)
@@ -674,30 +677,30 @@ markIconSpan.style.marginLeft = '5px'
   // 文字信息将与动画同步显示
 
   // 创建返回按钮
-  const returnButton = document.createElement('button')
-  returnButton.className = 'return-button'
-  returnButton.innerHTML = '×'
-  returnButton.style.position = 'absolute'
-  returnButton.style.top = '10px'
-  returnButton.style.right = '10px'
-  returnButton.style.width = '40px'
-  returnButton.style.height = '40px'
-  returnButton.style.borderRadius = '50%'
-  returnButton.style.border = 'none'
-  returnButton.style.background = 'rgba(0, 0, 0, 0.7)'
-  returnButton.style.color = 'white'
-  returnButton.style.fontSize = '24px'
-  returnButton.style.cursor = 'pointer'
-  returnButton.style.display = 'flex'
-  returnButton.style.alignItems = 'center'
-  returnButton.style.justifyContent = 'center'
-  returnButton.style.zIndex = '100000'
-  returnButton.style.opacity = '0'
-  returnButton.style.transition = 'all 0.3s ease'
-  returnButton.style.transform = 'scale(0.8)'
-  returnButton.addEventListener('click', returnToOriginalPosition)
+  const returnButton = document.createElement('button');
+  returnButton.className = 'return-button';
+  returnButton.innerHTML = '×';
+  (returnButton as HTMLButtonElement).style.position = 'absolute';
+  (returnButton as HTMLButtonElement).style.top = '10px';
+  (returnButton as HTMLButtonElement).style.right = '10px';
+  (returnButton as HTMLButtonElement).style.width = '40px';
+  (returnButton as HTMLButtonElement).style.height = '40px';
+  (returnButton as HTMLButtonElement).style.borderRadius = '50%';
+  (returnButton as HTMLButtonElement).style.border = 'none';
+  (returnButton as HTMLButtonElement).style.background = 'rgba(0, 0, 0, 0.7)';
+  (returnButton as HTMLButtonElement).style.color = 'white';
+  (returnButton as HTMLButtonElement).style.fontSize = '24px';
+  (returnButton as HTMLButtonElement).style.cursor = 'pointer';
+  (returnButton as HTMLButtonElement).style.display = 'flex';
+  (returnButton as HTMLButtonElement).style.alignItems = 'center';
+  (returnButton as HTMLButtonElement).style.justifyContent = 'center';
+  (returnButton as HTMLButtonElement).style.zIndex = '100000';
+  (returnButton as HTMLButtonElement).style.opacity = '0';
+  (returnButton as HTMLButtonElement).style.transition = 'all 0.3s ease';
+  (returnButton as HTMLButtonElement).style.transform = 'scale(0.8)';
+  (returnButton as HTMLButtonElement).addEventListener('click', returnToOriginalPosition);
 
-  animatedContainer.appendChild(returnButton)
+  (animatedContainer as HTMLDivElement).appendChild(returnButton);
 
   // 执行动画效果
   requestAnimationFrame(() => {
@@ -761,12 +764,12 @@ markIconSpan.style.marginLeft = '5px'
 
 // 返回原位置
 const returnToOriginalPosition = () => {
-  const animatedContainer = document.querySelector('.animated-poster-container')
-  const textInfo = animatedContainer?.querySelector('.animated-text-info')
-  const blurBackground = document.querySelector('.blur-background')
-  const returnButton = document.querySelector('.return-button')
+  const animatedContainerElement = document.querySelector('.animated-poster-container') as HTMLElement | null
+  const textInfo = animatedContainerElement?.querySelector('.animated-text-info') as HTMLElement | null
+  const blurBackground = document.querySelector('.blur-background') as HTMLElement | null
+  const returnButton = document.querySelector('.return-button') as HTMLElement | null
 
-  if (animatedContainer && animatedContainer.parentNode && originalPosterRect.value && originalPosterElement.value) {
+  if (animatedContainerElement && animatedContainerElement.parentNode && originalPosterRect.value && originalPosterElement.value) {
     // 隐藏背景模糊
     if (blurBackground) {
       blurBackground.style.opacity = '0'
@@ -785,18 +788,18 @@ const returnToOriginalPosition = () => {
     }
 
     // 执行反向动画：回到原始位置（取整数像素值）
-    animatedContainer.style.left = `${Math.round(originalPosterRect.value.left)}px`
-    animatedContainer.style.top = `${Math.round(originalPosterRect.value.top)}px`
-    animatedContainer.style.width = `${Math.round(originalPosterRect.value.width)}px`
-    animatedContainer.style.height = `${Math.round(originalPosterRect.value.height)}px`
-    animatedContainer.style.transform = 'scale(1)'
-    animatedContainer.style.zIndex = '9999'
+    animatedContainerElement.style.left = `${Math.round(originalPosterRect.value.left)}px`
+    animatedContainerElement.style.top = `${Math.round(originalPosterRect.value.top)}px`
+    animatedContainerElement.style.width = `${Math.round(originalPosterRect.value.width)}px`
+    animatedContainerElement.style.height = `${Math.round(originalPosterRect.value.height)}px`
+    animatedContainerElement.style.transform = 'scale(1)'
+    animatedContainerElement.style.zIndex = '9999'
 
     // 动画完成后移除动画容器并恢复原始海报
     setTimeout(() => {
       // 先移除动画容器
-      if (animatedContainer.parentNode) {
-        document.body.removeChild(animatedContainer)
+      if (animatedContainerElement.parentNode) {
+        document.body.removeChild(animatedContainerElement)
       }
       // 移除背景模糊
       if (blurBackground && blurBackground.parentNode) {
@@ -819,8 +822,8 @@ const returnToOriginalPosition = () => {
     }, 400) // 与动画时长一致
   } else {
     // 如果没有动画容器或原始位置信息，直接移除
-    if (animatedContainer && animatedContainer.parentNode) {
-      document.body.removeChild(animatedContainer)
+    if (animatedContainerElement && animatedContainerElement.parentNode) {
+      document.body.removeChild(animatedContainerElement)
     }
   }
 }
@@ -879,10 +882,7 @@ onMounted(() => {
 }
 
 .movie-card {
-  /* background: white; */
-  border-radius: 12px;
   overflow: hidden;
-  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
   cursor: pointer;
   height: 100%;
   display: flex;
@@ -995,7 +995,7 @@ onMounted(() => {
 
 .movie-title {
   font-size: 1.1rem;
-  /* font-weight: 600; */
+  font-weight: 400;
   color: #333;
   margin: 0;
   line-height: 1.3;

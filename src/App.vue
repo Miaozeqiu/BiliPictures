@@ -161,7 +161,7 @@ const handleScroll = () => {
 }
 
 // 路由路径到平台类型的映射
-const routeToPlatform = {
+const routeToPlatform: { [key: string]: string } = {
   '/': '全部',
   '/home': '全部',
   '/movie': '电影',
