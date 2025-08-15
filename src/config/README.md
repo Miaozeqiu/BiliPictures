@@ -132,8 +132,8 @@ interface MovieQueryParams {
 - `getMoviesByTags(tagIds, params?)` - 根据标签获取电影
 - `getMovieById(movieId)` - 获取单个电影
 - `getMovieTags(movieId)` - 获取电影标签
-- `getAllTags()` - 获取所有标签
-- `searchTags(tagName)` - 搜索标签
+- `getAllTags(params?)` - 获取所有标签，支持分页参数 { limit?, offset? }
+- `searchTags(tagName, params?)` - 搜索标签，支持分页参数 { limit?, offset? }
 - `getMovieStats()` - 获取电影统计信息
 
 ### 便捷导出方法

@@ -55,12 +55,10 @@ export class DatabaseService {
     }
 
     // 分页
-    if (params.limit) {
-      query = query.limit(params.limit)
-    }
-
-    if (params.offset) {
-      query = query.range(params.offset, params.offset + (params.limit || 10) - 1)
+    if (params.offset !== undefined || params.limit !== undefined) {
+      const limit = params.limit || 20
+      const offset = params.offset || 0
+      query = query.range(offset, offset + limit - 1)
     }
 
     const { data, error } = await query
@@ -80,11 +78,27 @@ export class DatabaseService {
    * @returns Promise<Movie[]>
    */
   static async getMoviesByTags(tagIds: number[], params: MovieQueryParams = {}): Promise<Movie[]> {
-    // 先获取包含指定标签的电影ID
-    const { data: movieTags, error: tagError } = await supabase
+    // 先获取包含指定标签且有bilibili_url的电影ID，应用分页参数
+    let movieTagsQuery = supabase
       .from('movie_tags')
-      .select('movie_id')
+      .select(`
+        movie_id,
+        movies!inner(
+          movie_id,
+          movie_bilibili_urls!inner(id)
+        )
+      `)
       .in('tag_id', tagIds)
+      .order('movie_id', { ascending: true }) // 确保排序一致性
+
+    // 为 movie_tags 查询添加分页支持
+    if (params.offset !== undefined || params.limit !== undefined) {
+      const limit = params.limit || 20
+      const offset = params.offset || 0
+      movieTagsQuery = movieTagsQuery.range(offset, offset + limit - 1)
+    }
+
+    const { data: movieTags, error: tagError } = await movieTagsQuery
 
     if (tagError) {
       console.error('获取电影标签失败:', tagError)
@@ -141,14 +155,7 @@ export class DatabaseService {
       query = query.order('movie_id', { ascending: true })
     }
 
-    // 分页
-    if (params.limit) {
-      query = query.limit(params.limit)
-    }
-
-    if (params.offset) {
-      query = query.range(params.offset, params.offset + (params.limit || 10) - 1)
-    }
+    // 分页已在 movie_tags 查询阶段处理，这里不再重复应用
 
     const { data, error } = await query
 
@@ -209,13 +216,25 @@ export class DatabaseService {
 
   /**
    * 获取所有标签
+   * @param params 查询参数，包含分页信息
    * @returns Promise<Tag[]>
    */
-  static async getAllTags(): Promise<Tag[]> {
-    const { data, error } = await supabase
+  static async getAllTags(params: { limit?: number; offset?: number } = {}): Promise<Tag[]> {
+    let query = supabase
       .from('tags')
       .select('*')
       .order('tag_name', { ascending: true })
+
+    // 添加分页支持
+    if (params.limit) {
+      query = query.limit(params.limit)
+    }
+
+    if (params.offset) {
+      query = query.range(params.offset, params.offset + (params.limit || 10) - 1)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('获取标签列表失败:', error)
@@ -228,14 +247,26 @@ export class DatabaseService {
   /**
    * 根据名称搜索标签
    * @param tagName 标签名称
+   * @param params 查询参数，包含分页信息
    * @returns Promise<Tag[]>
    */
-  static async searchTags(tagName: string): Promise<Tag[]> {
-    const { data, error } = await supabase
+  static async searchTags(tagName: string, params: { limit?: number; offset?: number } = {}): Promise<Tag[]> {
+    let query = supabase
       .from('tags')
       .select('*')
       .ilike('tag_name', `%${tagName}%`)
       .order('tag_name', { ascending: true })
+
+    // 添加分页支持
+    if (params.limit) {
+      query = query.limit(params.limit)
+    }
+
+    if (params.offset) {
+      query = query.range(params.offset, params.offset + (params.limit || 10) - 1)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('搜索标签失败:', error)

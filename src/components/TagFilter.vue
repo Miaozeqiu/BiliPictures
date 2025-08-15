@@ -73,7 +73,8 @@ const isLoading = ref(true)
 const loadTags = async () => {
   try {
     isLoading.value = true
-    const dbTags = await DatabaseService.getAllTags()
+    // 添加分页参数，限制一次最多加载100个标签
+    const dbTags = await DatabaseService.getAllTags({ limit: 100, offset: 0 })
     // 转换数据库标签格式为组件需要的格式
     availableTags.value = dbTags.map(tag => ({
       id: tag.tag_id,

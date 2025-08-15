@@ -123,8 +123,16 @@ const fetchMovies = async (loadMore = false) => {
       return
     }
 
-    if (newMovies.length < 20) {
-      hasMoreMovies.value = false
+    // 更新 hasMoreMovies 状态
+    if (loadMore) {
+      // 加载更多时，如果返回的数据少于20条，说明没有更多数据了
+      if (newMovies.length < 20) {
+        hasMoreMovies.value = false
+      }
+    } else {
+      // 新查询时，如果第一页就少于20条，仍然可能有更多数据（因为可能有筛选条件）
+      // 只有当返回0条数据时，才确定没有更多数据
+      hasMoreMovies.value = newMovies.length > 0
     }
 
     currentMovies.value = loadMore ? [...currentMovies.value, ...newMovies] : newMovies
